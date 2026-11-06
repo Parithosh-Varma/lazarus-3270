@@ -1,0 +1,109 @@
+{
+  "mutants": 24,
+  "killed": 20,
+  "killRate": "83.3%",
+  "seed": 99,
+  "details": [
+    {
+      "name": "fee-100",
+      "killed": true
+    },
+    {
+      "name": "fee-200",
+      "killed": true
+    },
+    {
+      "name": "fee-zero",
+      "killed": true
+    },
+    {
+      "name": "no-overdraft-guard",
+      "killed": true
+    },
+    {
+      "name": "float-wire",
+      "killed": true
+    },
+    {
+      "name": "truncate-round",
+      "killed": true
+    },
+    {
+      "name": "offbyone-days-plus1",
+      "killed": true
+    },
+    {
+      "name": "rate-unquantized",
+      "killed": true
+    },
+    {
+      "name": "round-half-up",
+      "killed": false
+    },
+    {
+      "name": "skip-last-day",
+      "killed": true
+    },
+    {
+      "name": "double-fee",
+      "killed": true
+    },
+    {
+      "name": "allow-negative-amount",
+      "killed": true
+    },
+    {
+      "name": "cap-max-ignored",
+      "killed": true
+    },
+    {
+      "name": "interest-no-validate-days",
+      "killed": false
+    },
+    {
+      "name": "fee-149",
+      "killed": true
+    },
+    {
+      "name": "fee-151",
+      "killed": true
+    },
+    {
+      "name": "rate-x10",
+      "killed": true
+    },
+    {
+      "name": "days-x2",
+      "killed": true
+    },
+    {
+      "name": "principal-plus1",
+      "killed": true
+    },
+    {
+      "name": "ebcdic-space-for-unknown",
+      "killed": false
+    },
+    {
+      "name": "vibe-stepped-rounded",
+      "killed": false
+    },
+    {
+      "name": "wire-truncate-cents",
+      "killed": true
+    },
+    {
+      "name": "interest-floor",
+      "killed": true
+    },
+    {
+      "name": "interest-ceil",
+      "killed": true
+    },
+    {
+      "name": "ok-mutant-control",
+      "killed": false,
+      "note": "control must survive"
+    }
+  ]
+}
