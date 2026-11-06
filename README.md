@@ -1,5 +1,7 @@
 # Lazarus-3270 — Resurrect 1978 IBM 3270 + COBOL into MCP + modern cloud with PBT proof
 
+![logo](src/logo.png)
+
 Live Demo: TBD (Vue UI by teammate) | YouTube: TBD | MIT | PBT: 10007/10007 PASS, 0.0000% drift
 
 ## Problem
