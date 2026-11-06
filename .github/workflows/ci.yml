@@ -5,4 +5,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: test ! -e .kiro || echo ki ro-ok
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm install
+      - run: ./node_modules/.bin/tsc --noEmit -p tsconfig.json
+      - run: node --test tests/unit/*.test.mjs
+      - run: node --test tests/pbt/*.pbt.mjs
+      - run: npm run harness
+      - run: test -d .kiro/specs && test -d .kiro/hooks && test -d .kiro/steering && test -f LICENSE && git ls-tree HEAD .kiro/ | grep -q specs
