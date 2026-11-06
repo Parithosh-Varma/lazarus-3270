@@ -1,0 +1,18 @@
+[
+  { "id": "parse-basic", "kind": "parse", "in": "1005.13", "out": "100513" },
+  { "id": "parse-neg", "kind": "parse", "in": "-0.05", "out": "-5" },
+  { "id": "parse-plus", "kind": "parse", "in": "+10.00", "out": "1000" },
+  { "id": "format-neg", "kind": "format", "in": "-5", "out": "-0.05" },
+  { "id": "round-tie-even-2.5", "kind": "round", "in": [5, 2], "out": "2" },
+  { "id": "round-tie-odd-3.5", "kind": "round", "in": [7, 2], "out": "4" },
+  { "id": "round-neg-tie", "kind": "round", "in": [-3, 2], "out": "-2" },
+  { "id": "wire-basic", "kind": "wire", "in": [1000000, 100513], "out": [1100363, "OK"] },
+  { "id": "wire-fee-edge-150", "kind": "wire", "in": [150, 0], "out": [0, "OK"] },
+  { "id": "wire-fee-edge-149", "kind": "wire", "in": [149, 0], "out": [149, "OVERDRAFT"] },
+  { "id": "wire-overdraft-keeps", "kind": "wire", "in": [100, 0], "out": [100, "OVERDRAFT"] },
+  { "id": "interest-1day-1pct", "kind": "interest", "in": [100000, 3650, 1], "out": "100" },
+  { "id": "interest-zero-days", "kind": "interest", "in": [100000, 100, 0], "out": "0" },
+  { "id": "ebcdic-A", "kind": "ebcdic", "in": "A", "out": 193 },
+  { "id": "ebcdic-dash", "kind": "ebcdic", "in": "-", "out": 96 },
+  { "id": "ebcdic-unknown", "kind": "ebcdic", "in": "~", "out": 63 }
+]
