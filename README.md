@@ -2,6 +2,8 @@
 
 <img src="src/logo.png" width="120" alt="logo">
 
+<img src="docs/architecture-infographic.webp" width="100%" alt="architecture">
+
 Live Demo: TBD (Vue UI by teammate) | YouTube: TBD | MIT | PBT: 10007/10007 PASS, 0.0000% drift
 
 ## Problem
