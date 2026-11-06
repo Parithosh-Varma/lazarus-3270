@@ -1,0 +1,6 @@
+name = "lazarus-3270-mcp"
+main = "src/mcp/worker.ts"
+compatibility_date = "2026-01-01"
+
+[vars]
+ROUND_MODE = "NEAREST-EVEN"
