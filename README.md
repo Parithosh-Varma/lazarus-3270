@@ -49,6 +49,50 @@ Expected: `PBT harness: 10007/10007 legacy==modern PASS`, TSC clean.
 - Spec-driven vs vibe: vibe float version fails, Kiro BigInt passes. See harness.
 - Crew: Archaeologist (COBOL→spec), Alchemist (spec→TS), Inquisitor (break tests) — definitions in `.kiro/agents/`.
 
+## Kiro deep dive (for judges)
+### IDE vs CLI vs Web vs Crew
+- IDE wrote oracle + specs with steering blocking float.
+- CLI ran harness, tsc, tests in loop.
+- Web reviewed PR diffs.
+- Crew planned: Archaeologist reads .cpy via MCP, Alchemist emits TS under steering, Inquisitor writes breaking arbitraries.
+
+### Specs
+- EARS in `.kiro/specs/tn3270-emulator/requirements.md`: 5 rules, testable, linked to harness.
+- Design in design.md: screen rows, flow strings to pennies to strings, limits.
+- Tasks in tasks.md: 7 boxes, 6 done.
+
+### Hooks
+- on-copybook-save: update spec + schema.
+- on-spec-change: regen PBT.
+- pre-commit-decimal-guard: ban float in src/modern, run 1k PBT.
+
+### Steering
+- `cobol-decimal-safety.md` fileMatch src/modern forces BigInt + ROUND_HALF_EVEN, bans number for money.
+- product/tech/structure define vision, stack, layout.
+
+### MCP
+- Dev inspector via `.kiro/settings/mcp.json` exposes run_legacy_oracle for Kiro to query ground truth.
+- Runtime tools in src/mcp/server.ts, stdio uses stderr for logs to keep protocol clean.
+
+### PBT
+- Harness now: 7 edges (0,149,150,151,max) + 10k seeded wires + 10k interests. Next fast-check with bigInt, dates, overdraft, leap days.
+- Bug caught: divisor 100M vs 1M shrank balance to 0.00; float daily vs quantized daily mixed model with error, fixed to same quantized rate.
+- Shrink example stored as strings, BigInt-safe JSON.
+
+### Powers
+- Declared in `.kiro/powers/powers-manifest.json`: docker, openapi-mcp, security-audit. Used for container repro, typed tools, pre-submit audit.
+
+## Reproducibility
+- Node 24, no native deps. `npm install && npm run harness` deterministic via seeds 3270.
+- CI must run: tsc noEmit, node test, npm run harness, git ls-tree HEAD .kiro check, LICENSE check.
+- .env.example has PORT only, no secrets needed for backend proof.
+
+## Limitations (honest)
+- 1 cartridge only (CoreBank). SABRE-83 + CivicTax next.
+- Legacy equals modern shares core math today; next is packed COMP-3 bytes vs BigInt cents for independent oracle + golden vectors.
+- Day count is ACT/365-Fixed, no calendar leap handling yet.
+- COBOL ROUNDED default is away-from-zero, we use NEAREST-EVEN and label ROUND_MODE explicitly.
+
 ## Repo rules (do not break)
 - `/.kiro/` at root, never in `.gitignore`. Verified by CI.
 - Public GitHub, MIT in About. First commit Oct 30-Dec 4 2026 window.
