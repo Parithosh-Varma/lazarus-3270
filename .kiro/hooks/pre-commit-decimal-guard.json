@@ -1,0 +1,1 @@
+{"hook":"pre-commit","match":"src/modern/**","action":"ban float, run 1000 PBT"}

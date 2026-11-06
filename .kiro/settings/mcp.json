@@ -1,0 +1,1 @@
+{"mcpServers":{"lazarus-copybook-inspector":{"command":"node","args":["src/mcp/server.js"]}}}

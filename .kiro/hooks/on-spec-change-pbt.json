@@ -1,0 +1,1 @@
+{"hook":"on-spec-change","match":".kiro/specs/**/requirements.md","action":"regen fast-check PBT"}

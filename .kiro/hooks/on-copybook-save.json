@@ -1,0 +1,1 @@
+{"hook":"on-save","match":"src/cartridges/**/*.cpy","action":"update spec + regen schema"}
