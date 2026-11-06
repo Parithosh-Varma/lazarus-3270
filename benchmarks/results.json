@@ -1,0 +1,26 @@
+{
+  "runs": 10007,
+  "pass": 10007,
+  "drift": "0.0000%",
+  "vibeFloatFails": 7611,
+  "vibeExample": "principal=19090.99 bps=169 days=185 legacy=19253.95 vibe=19254.14 drift=0.19",
+  "seedWire": 3270,
+  "seedInterest": -1515869853,
+  "rateScale": "1000000",
+  "roundMode": "NEAREST-EVEN",
+  "ranges": {
+    "principalCents": [
+      500000,
+      2500000
+    ],
+    "bps": [
+      100,
+      3000
+    ],
+    "days": [
+      1,
+      365
+    ]
+  },
+  "node": "v24.19.0"
+}
