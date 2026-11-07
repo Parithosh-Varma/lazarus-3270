@@ -16,8 +16,11 @@ jobs:
       - run: node --test tests/unit/*.test.mjs
       - run: node --test tests/pbt/*.pbt.mjs
       - run: node --test tests/golden.test.mjs
+      - run: node --test tests/cartridges.test.mjs
       - name: compile and run the real COBOL oracle
         run: COBOL_REQUIRE=1 node harness/cobol-oracle.mjs
       - run: node --test tests/cobol.test.mjs
+      - name: compile and cross-check the five cartridge programs
+        run: COBOL_REQUIRE=1 node harness/cartridge-oracle.mjs
       - run: npm run harness
       - run: test -d .kiro/specs && test -d .kiro/hooks && test -d .kiro/steering && test -f LICENSE && git ls-tree HEAD .kiro/ | grep -q specs

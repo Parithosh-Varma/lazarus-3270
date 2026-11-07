@@ -1,5 +1,6 @@
 import { runLegacy } from "../legacy-engine/index.js";
 import { execute3270Transaction, verifyLedgerParity } from "../modern-engine/index.js";
+import { listCartridges, runCartridge } from "../cartridges/index.js";
 
 export const tools = {
   execute_3270_transaction: ({ balance, amount }: { balance: string; amount: string }) =>
@@ -10,6 +11,9 @@ export const tools = {
     const toC = (s: string) => BigInt(Math.round(parseFloat(s) * 100));
     return { parity: verifyLedgerParity(debits.map(toC), credits.map(toC)) };
   },
+  list_cartridges: () => ({ cartridges: listCartridges() }),
+  run_cartridge: ({ program, args }: { program: string; args?: Record<string, string> }) =>
+    runCartridge(program, args ?? {}),
 };
 
 export function callTool(name: string, params: any) {

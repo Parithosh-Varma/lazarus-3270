@@ -1,0 +1,31 @@
+[
+  { "id": "sabre-basic", "program": "SABRE-83", "args": { "seats": "42", "requested": "2", "fare": "249.00", "class": "J" }, "expect": { "status": "CONFIRMED", "probe": { "seats": "40", "fare": "37350" } } },
+  { "id": "sabre-waitlist", "program": "SABRE-83", "args": { "seats": "1", "requested": "2", "fare": "100.00", "class": "Y" }, "expect": { "status": "WAITLIST", "probe": { "seats": "1", "fare": "0" } } },
+  { "id": "sabre-tie-even-8", "program": "SABRE-83", "args": { "seats": "10", "requested": "1", "fare": "0.05", "class": "J" }, "expect": { "status": "CONFIRMED", "probe": { "seats": "9", "fare": "8" } } },
+  { "id": "sabre-tie-even-22", "program": "SABRE-83", "args": { "seats": "10", "requested": "1", "fare": "0.15", "class": "J" }, "expect": { "status": "CONFIRMED", "probe": { "seats": "9", "fare": "22" } } },
+  { "id": "sabre-invalid-request", "program": "SABRE-83", "args": { "seats": "10", "requested": "0", "fare": "10.00", "class": "Y" }, "expect": { "status": "INVALID_REQUEST", "probe": { "seats": "10", "fare": "0" } } },
+  { "id": "sabre-invalid-class", "program": "SABRE-83", "args": { "seats": "10", "requested": "1", "fare": "10.00", "class": "X" }, "expect": { "status": "INVALID_CLASS", "probe": { "seats": "10", "fare": "0" } } },
+
+  { "id": "tax-zero", "program": "CIVICTAX-78", "args": { "gross": "0.00" }, "expect": { "status": "OK", "probe": { "tax": "0", "b2": "0", "b3": "0", "b4": "0" } } },
+  { "id": "tax-1000-edge", "program": "CIVICTAX-78", "args": { "gross": "1000.00" }, "expect": { "status": "OK", "probe": { "tax": "0", "b2": "0", "b3": "0", "b4": "0" } } },
+  { "id": "tax-1000-01", "program": "CIVICTAX-78", "args": { "gross": "1000.01" }, "expect": { "status": "OK", "probe": { "tax": "0", "b2": "1", "b3": "0", "b4": "0" } } },
+  { "id": "tax-5000-edge", "program": "CIVICTAX-78", "args": { "gross": "5000.00" }, "expect": { "status": "OK", "probe": { "tax": "48000", "b2": "400000", "b3": "0", "b4": "0" } } },
+  { "id": "tax-10000-edge", "program": "CIVICTAX-78", "args": { "gross": "10000.00" }, "expect": { "status": "OK", "probe": { "tax": "158000", "b2": "400000", "b3": "500000", "b4": "0" } } },
+  { "id": "tax-12500", "program": "CIVICTAX-78", "args": { "gross": "12500.00" }, "expect": { "status": "OK", "probe": { "tax": "238000", "b2": "400000", "b3": "500000", "b4": "250000" } } },
+
+  { "id": "loan-basic", "program": "LOAN-78", "args": { "balance": "10000.00", "bps": "1250", "payment": "250.00" }, "expect": { "status": "OK", "probe": { "newBalance": "985417", "interest": "10417", "principal": "14583" } } },
+  { "id": "loan-neg-amort", "program": "LOAN-78", "args": { "balance": "1000.00", "bps": "1250", "payment": "5.00" }, "expect": { "status": "NEG_AMORT", "probe": { "newBalance": "100000", "interest": "1042", "principal": "0" } } },
+  { "id": "loan-paid", "program": "LOAN-78", "args": { "balance": "100.00", "bps": "0", "payment": "100.00" }, "expect": { "status": "PAID", "probe": { "newBalance": "0", "interest": "0", "principal": "10000" } } },
+  { "id": "loan-zero-balance", "program": "LOAN-78", "args": { "balance": "0.00", "bps": "1999", "payment": "10.00" }, "expect": { "status": "PAID", "probe": { "newBalance": "0", "interest": "0", "principal": "0" } } },
+
+  { "id": "telco-no-call", "program": "TELCO-79", "args": { "seconds": "0", "rate": "0.50", "fee": "0.15" }, "expect": { "status": "NO_CALL", "probe": { "units": "0", "cost": "0" } } },
+  { "id": "telco-1s", "program": "TELCO-79", "args": { "seconds": "1", "rate": "0.50", "fee": "0.15" }, "expect": { "status": "OK", "probe": { "units": "1", "cost": "20" } } },
+  { "id": "telco-6s", "program": "TELCO-79", "args": { "seconds": "6", "rate": "0.50", "fee": "0.15" }, "expect": { "status": "OK", "probe": { "units": "1", "cost": "20" } } },
+  { "id": "telco-7s", "program": "TELCO-79", "args": { "seconds": "7", "rate": "0.50", "fee": "0.15" }, "expect": { "status": "OK", "probe": { "units": "2", "cost": "25" } } },
+  { "id": "telco-67s", "program": "TELCO-79", "args": { "seconds": "67", "rate": "0.50", "fee": "0.15" }, "expect": { "status": "OK", "probe": { "units": "12", "cost": "75" } } },
+
+  { "id": "meter-100", "program": "METER-78", "args": { "kwh": "100" }, "expect": { "status": "OK", "probe": { "bill": "1250", "t1": "100", "t2": "0", "t3": "0" } } },
+  { "id": "meter-250", "program": "METER-78", "args": { "kwh": "250" }, "expect": { "status": "OK", "probe": { "bill": "3950", "t1": "100", "t2": "150", "t3": "0" } } },
+  { "id": "meter-251", "program": "METER-78", "args": { "kwh": "251" }, "expect": { "status": "OK", "probe": { "bill": "3974", "t1": "100", "t2": "150", "t3": "1" } } },
+  { "id": "meter-320", "program": "METER-78", "args": { "kwh": "320" }, "expect": { "status": "OK", "probe": { "bill": "5630", "t1": "100", "t2": "150", "t3": "70" } } }
+]

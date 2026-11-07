@@ -25,6 +25,7 @@ if (!existsSync("dist/modern-engine/index.js")) {
 
 const legacy = await import(pathToFileURL(join(ROOT, "dist/legacy-engine/index.js")).href);
 const modern = await import(pathToFileURL(join(ROOT, "dist/modern-engine/index.js")).href);
+const carts = await import(pathToFileURL(join(ROOT, "dist/cartridges/index.js")).href);
 
 const readJson = (path, fallback) => {
   try {
@@ -134,8 +135,30 @@ const server = createServer((req, res) => {
       ...proofNumbers(),
       node: process.version,
       roundMode: legacy.ROUND_MODE,
-      tools: ["execute_3270_transaction", "run_legacy_oracle", "verify_ledger_parity"],
+      tools: [
+        "execute_3270_transaction",
+        "run_legacy_oracle",
+        "verify_ledger_parity",
+        "list_cartridges",
+        "run_cartridge",
+      ],
     });
+  }
+  if (req.method === "GET" && url.pathname === "/api/cartridges") {
+    return json(res, 200, { cartridges: carts.listCartridges() });
+  }
+  if (req.method === "POST" && url.pathname === "/api/cartridge") {
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", () => {
+      try {
+        const { program, args } = JSON.parse(body || "{}");
+        json(res, 200, carts.runCartridge(program, args ?? {}));
+      } catch (e) {
+        json(res, 400, { error: String(e?.message ?? e) });
+      }
+    });
+    return;
   }
   if (req.method === "POST" && url.pathname === "/api/transaction") {
     let body = "";

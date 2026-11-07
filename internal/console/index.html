@@ -125,7 +125,8 @@
     font-size: 11.5px;
   }
 
-  .field input {
+  .field input,
+  .field select {
     flex: 1;
     min-width: 0;
     background: transparent;
@@ -140,13 +141,77 @@
     caret-color: var(--p1);
   }
 
-  .field input:focus {
+  .field select { cursor: pointer; }
+  .field select option { background: #0a130c; color: var(--p1); }
+
+  .dd { position: relative; flex: 1; min-width: 0; }
+
+  .dd-btn {
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--p1-dim);
+    color: var(--p1);
+    font: inherit;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    padding: 3px 2px 4px;
+    cursor: pointer;
+    text-align: left;
+    text-shadow: 0 0 8px rgba(124, 242, 155, 0.3);
+  }
+
+  .dd-btn:hover { border-bottom-color: var(--p1); background: rgba(124, 242, 155, 0.05); }
+  .dd-btn:focus-visible { outline: 1px solid var(--p1); outline-offset: 3px; }
+
+  .dd-btn .txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dd-arrow { color: var(--p1-mid); font-size: 12px; }
+  .dd.open .dd-arrow { color: var(--p1); }
+
+  .dd-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    list-style: none;
+    background: #0a130c;
+    border: 1px solid var(--p1-dim);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.6), 0 8px 28px rgba(0,0,0,0.6), 0 0 14px rgba(124,242,155,0.12);
+    max-height: 240px;
+    overflow-y: auto;
+  }
+
+  .dd-list[hidden] { display: none; }
+
+  .dd-list li {
+    padding: 7px 10px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    color: var(--p1-mid);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dd-list li .lid { color: var(--p1-dim); margin-right: 8px; }
+  .dd-list li:hover, .dd-list li.hot { background: rgba(124, 242, 155, 0.1); color: var(--p1); }
+  .dd-list li[aria-selected="true"] { color: var(--p1); text-shadow: 0 0 8px rgba(124,242,155,0.35); }
+  .dd-list li[aria-selected="true"]::before { content: "▸ "; }
+
+  .field input:focus,
+  .field select:focus {
     outline: none;
     border-bottom-color: var(--p1);
     background: rgba(124, 242, 155, 0.05);
   }
 
-  .field input:focus-visible { outline: 1px solid var(--p1); outline-offset: 3px; }
+  .field input:focus-visible,
+  .field select:focus-visible { outline: 1px solid var(--p1); outline-offset: 3px; }
 
   .screen {
     flex: 1;
@@ -287,17 +352,28 @@
       <div class="tag">COREBANK · TXN 01 · WIRE TRANSFER</div>
 
       <div class="field">
-        <label for="balance">ACCOUNT BALANCE</label>
-        <input id="balance" value="10000.00" inputmode="decimal" autocomplete="off" spellcheck="false">
+        <label id="program-label">PROGRAM</label>
+        <div class="dd" id="dd">
+          <button type="button" class="dd-btn" id="program" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="program-label program-text">
+            <span class="txt" id="program-text">COREBANK-WIRE · WIRE TRANSFER</span>
+            <span class="dd-arrow" aria-hidden="true">▾</span>
+          </button>
+          <ul class="dd-list" id="program-list" role="listbox" aria-labelledby="program-label" hidden></ul>
+        </div>
       </div>
-      <div class="field">
-        <label for="amount">AMOUNT</label>
-        <input id="amount" value="1005.13" inputmode="decimal" autocomplete="off" spellcheck="false">
+
+      <div id="fields">
+        <div class="field">
+          <label for="balance">ACCOUNT BALANCE</label>
+          <input id="balance" value="10000.00" inputmode="decimal" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="amount">AMOUNT</label>
+          <input id="amount" value="1005.13" inputmode="decimal" autocomplete="off" spellcheck="false">
+        </div>
       </div>
-      <div class="field">
-        <label>WIRE FEE</label>
-        <span class="lnote">1.50 · DEBITED BEFORE THE OVERDRAFT CHECK</span>
-      </div>
+
+      <div class="lnote" id="blurb">Wire fee 1.50, debited before the overdraft check.</div>
 
       <pre class="screen" id="screen" aria-live="polite">COREBANK 3270 READY
 AWAITING AID_ENTER<span class="cursor"></span></pre>
@@ -305,8 +381,9 @@ AWAITING AID_ENTER<span class="cursor"></span></pre>
       <div class="dump" id="dump" aria-label="EBCDIC bytes"></div>
 
       <div class="actions">
-        <button id="execute" type="button">PF1 · EXECUTE WIRE</button>
+        <button id="execute" type="button">PF1 · EXECUTE</button>
         <button id="clear" type="button" class="ghost">PF3 · CLEAR</button>
+        <button id="sound" type="button" class="ghost">F4 · SOUND ON</button>
       </div>
     </section>
 
@@ -372,6 +449,41 @@ AWAITING AID_ENTER<span class="cursor"></span></pre>
 <script>
 const $ = (id) => document.getElementById(id);
 const CELLS = 28;
+
+/* SFX: tiny WebAudio synth, no assets. Lazily created on first user
+   gesture so autoplay policy stays happy; silent when toggled off. */
+let soundOn = true;
+let AC = null;
+const ac = () => {
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === "suspended") AC.resume().catch(() => {});
+  return AC;
+};
+function tone(freq, delayMs, durMs, type = "square", vol = 0.035) {
+  if (!soundOn) return;
+  try {
+    const ctx = ac();
+    const t = ctx.currentTime + delayMs / 1000;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0004, t + durMs / 1000);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + durMs / 1000 + 0.02);
+  } catch { /* audio unavailable: stay silent */ }
+}
+const sfx = {
+  click: () => tone(880, 0, 35),
+  select: () => { tone(660, 0, 40); tone(990, 50, 50); },
+  ok: () => { tone(660, 0, 60); tone(990, 70, 90); },
+  warn: () => tone(330, 0, 140, "triangle", 0.05),
+  bad: () => { tone(180, 0, 120, "sawtooth", 0.05); tone(140, 130, 160, "sawtooth", 0.05); },
+  result: (t) => { (t === "ok" ? sfx.ok : t === "warn" ? sfx.warn : sfx.bad)(); },
+};
 
 function meter(id, pass, total, amber) {
   const on = total > 0 ? Math.round((pass / total) * CELLS) : 0;
@@ -440,27 +552,109 @@ function render(d) {
   if (d.modern.status === "OK") oia("TXN OK · " + d.modern.newBalance, null);
   else if (d.modern.status === "OVERDRAFT") oia("TXN OVERDRAFT · BALANCE UNCHANGED", "warn");
   else oia("TXN SIZE_ERROR · BALANCE UNCHANGED", "bad");
+  sfx.result(tone);
 }
 
 function escapeHtml(s) {
   return s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
 }
 
+const WIRE = "COREBANK-WIRE";
+let catalog = [{
+  id: WIRE,
+  title: "WIRE TRANSFER",
+  blurb: "Wire fee 1.50, debited before the overdraft check.",
+  inputs: [
+    { name: "balance", label: "ACCOUNT BALANCE", value: "10000.00" },
+    { name: "amount", label: "AMOUNT", value: "1005.13" },
+  ],
+}];
+
+let selectedId = WIRE;
+
+const current = () => catalog.find((c) => c.id === selectedId) ?? catalog[0];
+const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+
+function renderFields() {
+  const cart = current();
+  $("blurb").textContent = cart.blurb;
+  $("screen").innerHTML =
+    esc(cart.id + " · " + cart.title.toUpperCase()) + " READY\nAWAITING AID_ENTER" +
+    '<span class="cursor"></span>';
+  $("dump").innerHTML = "";
+  oia("PROGRAM " + cart.id + " LOADED", null);
+  const wrap = $("fields");
+  wrap.innerHTML = "";
+  for (const f of cart.inputs) {
+    const row = document.createElement("div");
+    row.className = "field";
+    const label = document.createElement("label");
+    label.textContent = f.label;
+    label.htmlFor = "f-" + f.name;
+    const input = document.createElement("input");
+    input.id = "f-" + f.name;
+    input.value = f.value;
+    input.autocomplete = "off";
+    input.spellcheck = false;
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); execute(); }
+    });
+    row.append(label, input);
+    wrap.append(row);
+  }
+}
+
+function collect() {
+  const args = {};
+  for (const f of current().inputs) args[f.name] = $("f-" + f.name).value;
+  return args;
+}
+
+const OK_STATES = new Set(["OK", "CONFIRMED", "PAID"]);
+const WARN_STATES = new Set(["WAITLIST", "OVERDRAFT", "NO_CALL", "NEG_AMORT"]);
+
+function toneFor(status) {
+  return OK_STATES.has(status) ? "ok" : WARN_STATES.has(status) ? "warn" : "bad";
+}
+
+function renderCartridge(d) {
+  const tone = toneFor(d.status);
+  const lines = d.screen.split("\n").map((line, i) =>
+    '<span class="' + (i === 0 ? "hi" : "") + '">' + esc(line) + "</span>"
+  );
+  $("screen").innerHTML =
+    lines.join("\n") +
+    '\n<span class="' + tone + '">STATUS ' + esc(d.status) + "</span>" +
+    '\n<span class="lnote">' +
+    Object.entries(d.probe).map(([k, v]) => k + " " + v).join(" · ") +
+    "</span>" +
+    '<span class="cursor"></span>';
+  dump(d.ebcdic);
+  oia(d.program + " · " + d.status, tone === "ok" ? null : tone);
+  sfx.result(tone);
+}
+
 async function execute() {
   const btn = $("execute");
   btn.disabled = true;
+  sfx.click();
   oia("SENDING …", null);
   try {
-    const res = await fetch("/api/transaction", {
+    const cart = current();
+    const isWire = cart.id === WIRE;
+    const res = await fetch(isWire ? "/api/transaction" : "/api/cartridge", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ balance: $("balance").value, amount: $("amount").value }),
+      body: JSON.stringify(
+        isWire ? collect() : { program: cart.id, args: collect() }
+      ),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "request failed");
-    render(data);
+    if (isWire) render(data);
+    else renderCartridge(data);
   } catch (e) {
-    $("screen").innerHTML = '<span class="bad">' + escapeHtml(String(e.message || e)) + "</span>";
+    $("screen").innerHTML = '<span class="bad">' + esc(String(e.message || e)) + "</span>";
     oia("X SYSTEM · SERVER DID NOT RESPOND", "bad");
   } finally {
     btn.disabled = false;
@@ -482,9 +676,11 @@ async function prove() {
       " · " + data.equivalence.ms + "ms harness";
     oia("PROOF " + data.equivalence.pass + "/" + data.equivalence.total +
       " · " + data.fault.killed + "/" + data.fault.total + " MUTANTS KILLED", null);
+    sfx.ok();
   } catch (e) {
     $("stamp").textContent = String(e.message || e);
     oia("PROOF SUITE FAILED", "bad");
+    sfx.bad();
   } finally {
     btn.disabled = false;
   }
@@ -498,21 +694,124 @@ function clock() {
 $("execute").addEventListener("click", execute);
 $("prove").addEventListener("click", prove);
 $("clear").addEventListener("click", () => {
-  $("screen").innerHTML = "COREBANK 3270 READY\nAWAITING AID_ENTER" + '<span class="cursor"></span>';
+  const cart = current();
+  $("screen").innerHTML = cart.id + " READY\nAWAITING AID_ENTER" + '<span class="cursor"></span>';
   $("dump").innerHTML = "";
   oia("CLEARED · READY", null);
 });
 
-for (const id of ["balance", "amount"]) {
-  $(id).addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { e.preventDefault(); execute(); }
-  });
+async function boot() {
+  renderFields();
+  try {
+    const res = await fetch("/api/cartridges");
+    const data = await res.json();
+    catalog = catalog.concat(data.cartridges ?? []);
+  } catch {
+    /* offline: CoreBank only */
+  }
+  buildOptions();
+  renderFields();
 }
+
+function buildOptions() {
+  const list = $("program-list");
+  list.innerHTML = "";
+  for (const c of catalog) {
+    const li = document.createElement("li");
+    li.id = "opt-" + c.id;
+    li.setAttribute("role", "option");
+    li.setAttribute("aria-selected", c.id === selectedId ? "true" : "false");
+    li.dataset.id = c.id;
+    const head = document.createElement("span");
+    head.className = "lid";
+    head.textContent = c.id;
+    li.append(head, document.createTextNode(c.title));
+    li.addEventListener("click", () => selectProgram(c.id));
+    li.addEventListener("mousemove", () => setHot(c.id));
+    list.append(li);
+  }
+  $("program-text").textContent = current().id + " · " + current().title;
+}
+
+function selectProgram(id) {
+  selectedId = id;
+  sfx.select();
+  for (const li of $("program-list").children) {
+    li.setAttribute("aria-selected", li.dataset.id === id ? "true" : "false");
+  }
+  $("program-text").textContent = current().id + " · " + current().title;
+  closeList();
+  $("program").focus({ preventScroll: true });
+  renderFields();
+}
+
+function setHot(id) {
+  for (const li of $("program-list").children) {
+    li.classList.toggle("hot", li.dataset.id === id);
+  }
+}
+
+function openList() {
+  $("dd").classList.add("open");
+  $("program-list").hidden = false;
+  $("program").setAttribute("aria-expanded", "true");
+  setHot(selectedId);
+  const sel = document.querySelector('#program-list li[aria-selected="true"]');
+  sel?.scrollIntoView({ block: "nearest" });
+}
+
+function closeList() {
+  $("dd").classList.remove("open");
+  $("program-list").hidden = true;
+  $("program").setAttribute("aria-expanded", "false");
+}
+
+function stepHot(dir) {
+  const ids = catalog.map((c) => c.id);
+  let i = ids.indexOf(document.querySelector("#program-list li.hot")?.dataset.id ?? selectedId);
+  i = (i + dir + ids.length) % ids.length;
+  setHot(ids[i]);
+  document.getElementById("opt-" + CSS.escape(ids[i]))?.scrollIntoView({ block: "nearest" });
+}
+
+$("program").addEventListener("click", () => {
+  $("program-list").hidden ? openList() : closeList();
+});
+
+$("program").addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    if ($("program-list").hidden) openList();
+    else stepHot(e.key === "ArrowDown" ? 1 : -1);
+  } else if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    if ($("program-list").hidden) openList();
+    else selectProgram(document.querySelector("#program-list li.hot")?.dataset.id ?? selectedId);
+  } else if (e.key === "Escape") {
+    closeList();
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if (!$("dd").contains(e.target)) closeList();
+});
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "F1") { e.preventDefault(); execute(); }
   if (e.key === "F2") { e.preventDefault(); prove(); }
+  if (e.key === "F4") { e.preventDefault(); toggleSound(); }
 });
+
+function toggleSound() {
+  soundOn = !soundOn;
+  $("sound").textContent = soundOn ? "F4 · SOUND ON" : "F4 · SOUND OFF";
+  oia(soundOn ? "SOUND ON" : "SOUND OFF · SILENT RUNNING", null);
+  if (soundOn) sfx.click();
+}
+
+$("sound").addEventListener("click", toggleSound);
+
+boot();
 
 clock();
 setInterval(clock, 1000);

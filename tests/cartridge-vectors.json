@@ -1,0 +1,783 @@
+{
+  "source": "src/cartridges/*.cbl",
+  "compiler": "cobc (GnuCOBOL) 3.2.0",
+  "note": "Produced by the compiled cartridge programs. Regenerate: node harness/cartridge-oracle.mjs --emit",
+  "vectors": [
+    {
+      "cartridge": "SABRE-83",
+      "args": {
+        "seats": "42",
+        "requested": "2",
+        "fare": "249.00",
+        "class": "J"
+      },
+      "cobol": {
+        "status": "CONFIRMED",
+        "seats": "40",
+        "fare": "37350"
+      },
+      "typescript": {
+        "status": "CONFIRMED",
+        "seats": "40",
+        "fare": "37350"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "SABRE-83",
+      "args": {
+        "seats": "1",
+        "requested": "2",
+        "fare": "100.00",
+        "class": "Y"
+      },
+      "cobol": {
+        "status": "WAITLIST",
+        "seats": "1",
+        "fare": "0"
+      },
+      "typescript": {
+        "status": "WAITLIST",
+        "seats": "1",
+        "fare": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "SABRE-83",
+      "args": {
+        "seats": "10",
+        "requested": "1",
+        "fare": "0.05",
+        "class": "J"
+      },
+      "cobol": {
+        "status": "CONFIRMED",
+        "seats": "9",
+        "fare": "8"
+      },
+      "typescript": {
+        "status": "CONFIRMED",
+        "seats": "9",
+        "fare": "8"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "SABRE-83",
+      "args": {
+        "seats": "10",
+        "requested": "1",
+        "fare": "0.15",
+        "class": "J"
+      },
+      "cobol": {
+        "status": "CONFIRMED",
+        "seats": "9",
+        "fare": "22"
+      },
+      "typescript": {
+        "status": "CONFIRMED",
+        "seats": "9",
+        "fare": "22"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "SABRE-83",
+      "args": {
+        "seats": "10",
+        "requested": "0",
+        "fare": "10.00",
+        "class": "Y"
+      },
+      "cobol": {
+        "status": "INVALID_REQUEST",
+        "seats": "10",
+        "fare": "0"
+      },
+      "typescript": {
+        "status": "INVALID_REQUEST",
+        "seats": "10",
+        "fare": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "SABRE-83",
+      "args": {
+        "seats": "10",
+        "requested": "1",
+        "fare": "10.00",
+        "class": "X"
+      },
+      "cobol": {
+        "status": "INVALID_CLASS",
+        "seats": "10",
+        "fare": "0"
+      },
+      "typescript": {
+        "status": "INVALID_CLASS",
+        "seats": "10",
+        "fare": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "SABRE-83",
+      "args": {
+        "seats": "0",
+        "requested": "1",
+        "fare": "10.00",
+        "class": "F"
+      },
+      "cobol": {
+        "status": "WAITLIST",
+        "seats": "0",
+        "fare": "0"
+      },
+      "typescript": {
+        "status": "WAITLIST",
+        "seats": "0",
+        "fare": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "SABRE-83",
+      "args": {
+        "seats": "5",
+        "requested": "5",
+        "fare": "999.99",
+        "class": "F"
+      },
+      "cobol": {
+        "status": "CONFIRMED",
+        "seats": "0",
+        "fare": "249998"
+      },
+      "typescript": {
+        "status": "CONFIRMED",
+        "seats": "0",
+        "fare": "249998"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "CIVICTAX-78",
+      "args": {
+        "gross": "0.00"
+      },
+      "cobol": {
+        "status": "OK",
+        "tax": "0",
+        "b2": "0",
+        "b3": "0",
+        "b4": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "tax": "0",
+        "b2": "0",
+        "b3": "0",
+        "b4": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "CIVICTAX-78",
+      "args": {
+        "gross": "1000.00"
+      },
+      "cobol": {
+        "status": "OK",
+        "tax": "0",
+        "b2": "0",
+        "b3": "0",
+        "b4": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "tax": "0",
+        "b2": "0",
+        "b3": "0",
+        "b4": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "CIVICTAX-78",
+      "args": {
+        "gross": "1000.01"
+      },
+      "cobol": {
+        "status": "OK",
+        "tax": "0",
+        "b2": "1",
+        "b3": "0",
+        "b4": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "tax": "0",
+        "b2": "1",
+        "b3": "0",
+        "b4": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "CIVICTAX-78",
+      "args": {
+        "gross": "5000.00"
+      },
+      "cobol": {
+        "status": "OK",
+        "tax": "48000",
+        "b2": "400000",
+        "b3": "0",
+        "b4": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "tax": "48000",
+        "b2": "400000",
+        "b3": "0",
+        "b4": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "CIVICTAX-78",
+      "args": {
+        "gross": "5000.01"
+      },
+      "cobol": {
+        "status": "OK",
+        "tax": "48000",
+        "b2": "400000",
+        "b3": "1",
+        "b4": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "tax": "48000",
+        "b2": "400000",
+        "b3": "1",
+        "b4": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "CIVICTAX-78",
+      "args": {
+        "gross": "10000.00"
+      },
+      "cobol": {
+        "status": "OK",
+        "tax": "158000",
+        "b2": "400000",
+        "b3": "500000",
+        "b4": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "tax": "158000",
+        "b2": "400000",
+        "b3": "500000",
+        "b4": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "CIVICTAX-78",
+      "args": {
+        "gross": "10000.01"
+      },
+      "cobol": {
+        "status": "OK",
+        "tax": "158000",
+        "b2": "400000",
+        "b3": "500000",
+        "b4": "1"
+      },
+      "typescript": {
+        "status": "OK",
+        "tax": "158000",
+        "b2": "400000",
+        "b3": "500000",
+        "b4": "1"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "CIVICTAX-78",
+      "args": {
+        "gross": "12500.00"
+      },
+      "cobol": {
+        "status": "OK",
+        "tax": "238000",
+        "b2": "400000",
+        "b3": "500000",
+        "b4": "250000"
+      },
+      "typescript": {
+        "status": "OK",
+        "tax": "238000",
+        "b2": "400000",
+        "b3": "500000",
+        "b4": "250000"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "CIVICTAX-78",
+      "args": {
+        "gross": "999999.99"
+      },
+      "cobol": {
+        "status": "OK",
+        "tax": "31838000",
+        "b2": "400000",
+        "b3": "500000",
+        "b4": "98999999"
+      },
+      "typescript": {
+        "status": "OK",
+        "tax": "31838000",
+        "b2": "400000",
+        "b3": "500000",
+        "b4": "98999999"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "LOAN-78",
+      "args": {
+        "balance": "10000.00",
+        "bps": "1250",
+        "payment": "250.00"
+      },
+      "cobol": {
+        "status": "OK",
+        "newBalance": "985417",
+        "interest": "10417",
+        "principal": "14583"
+      },
+      "typescript": {
+        "status": "OK",
+        "newBalance": "985417",
+        "interest": "10417",
+        "principal": "14583"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "LOAN-78",
+      "args": {
+        "balance": "1000.00",
+        "bps": "1250",
+        "payment": "5.00"
+      },
+      "cobol": {
+        "status": "NEG_AMORT",
+        "newBalance": "100000",
+        "interest": "1042",
+        "principal": "0"
+      },
+      "typescript": {
+        "status": "NEG_AMORT",
+        "newBalance": "100000",
+        "interest": "1042",
+        "principal": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "LOAN-78",
+      "args": {
+        "balance": "100.00",
+        "bps": "0",
+        "payment": "100.00"
+      },
+      "cobol": {
+        "status": "PAID",
+        "newBalance": "0",
+        "interest": "0",
+        "principal": "10000"
+      },
+      "typescript": {
+        "status": "PAID",
+        "newBalance": "0",
+        "interest": "0",
+        "principal": "10000"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "LOAN-78",
+      "args": {
+        "balance": "100.00",
+        "bps": "0",
+        "payment": "1.00"
+      },
+      "cobol": {
+        "status": "OK",
+        "newBalance": "9900",
+        "interest": "0",
+        "principal": "100"
+      },
+      "typescript": {
+        "status": "OK",
+        "newBalance": "9900",
+        "interest": "0",
+        "principal": "100"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "LOAN-78",
+      "args": {
+        "balance": "0.00",
+        "bps": "1999",
+        "payment": "10.00"
+      },
+      "cobol": {
+        "status": "PAID",
+        "newBalance": "0",
+        "interest": "0",
+        "principal": "0"
+      },
+      "typescript": {
+        "status": "PAID",
+        "newBalance": "0",
+        "interest": "0",
+        "principal": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "LOAN-78",
+      "args": {
+        "balance": "1234.56",
+        "bps": "3599",
+        "payment": "99.99"
+      },
+      "cobol": {
+        "status": "OK",
+        "newBalance": "117160",
+        "interest": "3703",
+        "principal": "6296"
+      },
+      "typescript": {
+        "status": "OK",
+        "newBalance": "117160",
+        "interest": "3703",
+        "principal": "6296"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "TELCO-79",
+      "args": {
+        "seconds": "0",
+        "rate": "0.50",
+        "fee": "0.15"
+      },
+      "cobol": {
+        "status": "NO_CALL",
+        "units": "0",
+        "cost": "0"
+      },
+      "typescript": {
+        "status": "NO_CALL",
+        "units": "0",
+        "cost": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "TELCO-79",
+      "args": {
+        "seconds": "1",
+        "rate": "0.50",
+        "fee": "0.15"
+      },
+      "cobol": {
+        "status": "OK",
+        "units": "1",
+        "cost": "20"
+      },
+      "typescript": {
+        "status": "OK",
+        "units": "1",
+        "cost": "20"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "TELCO-79",
+      "args": {
+        "seconds": "6",
+        "rate": "0.50",
+        "fee": "0.15"
+      },
+      "cobol": {
+        "status": "OK",
+        "units": "1",
+        "cost": "20"
+      },
+      "typescript": {
+        "status": "OK",
+        "units": "1",
+        "cost": "20"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "TELCO-79",
+      "args": {
+        "seconds": "7",
+        "rate": "0.50",
+        "fee": "0.15"
+      },
+      "cobol": {
+        "status": "OK",
+        "units": "2",
+        "cost": "25"
+      },
+      "typescript": {
+        "status": "OK",
+        "units": "2",
+        "cost": "25"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "TELCO-79",
+      "args": {
+        "seconds": "67",
+        "rate": "0.50",
+        "fee": "0.15"
+      },
+      "cobol": {
+        "status": "OK",
+        "units": "12",
+        "cost": "75"
+      },
+      "typescript": {
+        "status": "OK",
+        "units": "12",
+        "cost": "75"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "TELCO-79",
+      "args": {
+        "seconds": "3600",
+        "rate": "1.25",
+        "fee": "0.00"
+      },
+      "cobol": {
+        "status": "OK",
+        "units": "600",
+        "cost": "7500"
+      },
+      "typescript": {
+        "status": "OK",
+        "units": "600",
+        "cost": "7500"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "TELCO-79",
+      "args": {
+        "seconds": "5",
+        "rate": "0.05",
+        "fee": "0.00"
+      },
+      "cobol": {
+        "status": "OK",
+        "units": "1",
+        "cost": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "units": "1",
+        "cost": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "METER-78",
+      "args": {
+        "kwh": "0"
+      },
+      "cobol": {
+        "status": "OK",
+        "bill": "0",
+        "t1": "0",
+        "t2": "0",
+        "t3": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "bill": "0",
+        "t1": "0",
+        "t2": "0",
+        "t3": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "METER-78",
+      "args": {
+        "kwh": "100"
+      },
+      "cobol": {
+        "status": "OK",
+        "bill": "1250",
+        "t1": "100",
+        "t2": "0",
+        "t3": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "bill": "1250",
+        "t1": "100",
+        "t2": "0",
+        "t3": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "METER-78",
+      "args": {
+        "kwh": "101"
+      },
+      "cobol": {
+        "status": "OK",
+        "bill": "1268",
+        "t1": "100",
+        "t2": "1",
+        "t3": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "bill": "1268",
+        "t1": "100",
+        "t2": "1",
+        "t3": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "METER-78",
+      "args": {
+        "kwh": "250"
+      },
+      "cobol": {
+        "status": "OK",
+        "bill": "3950",
+        "t1": "100",
+        "t2": "150",
+        "t3": "0"
+      },
+      "typescript": {
+        "status": "OK",
+        "bill": "3950",
+        "t1": "100",
+        "t2": "150",
+        "t3": "0"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "METER-78",
+      "args": {
+        "kwh": "251"
+      },
+      "cobol": {
+        "status": "OK",
+        "bill": "3974",
+        "t1": "100",
+        "t2": "150",
+        "t3": "1"
+      },
+      "typescript": {
+        "status": "OK",
+        "bill": "3974",
+        "t1": "100",
+        "t2": "150",
+        "t3": "1"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "METER-78",
+      "args": {
+        "kwh": "320"
+      },
+      "cobol": {
+        "status": "OK",
+        "bill": "5630",
+        "t1": "100",
+        "t2": "150",
+        "t3": "70"
+      },
+      "typescript": {
+        "status": "OK",
+        "bill": "5630",
+        "t1": "100",
+        "t2": "150",
+        "t3": "70"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "METER-78",
+      "args": {
+        "kwh": "1000"
+      },
+      "cobol": {
+        "status": "OK",
+        "bill": "21950",
+        "t1": "100",
+        "t2": "150",
+        "t3": "750"
+      },
+      "typescript": {
+        "status": "OK",
+        "bill": "21950",
+        "t1": "100",
+        "t2": "150",
+        "t3": "750"
+      },
+      "match": true
+    },
+    {
+      "cartridge": "METER-78",
+      "args": {
+        "kwh": "9999"
+      },
+      "cobol": {
+        "status": "OK",
+        "bill": "237926",
+        "t1": "100",
+        "t2": "150",
+        "t3": "9749"
+      },
+      "typescript": {
+        "status": "OK",
+        "bill": "237926",
+        "t1": "100",
+        "t2": "150",
+        "t3": "9749"
+      },
+      "match": true
+    }
+  ]
+}

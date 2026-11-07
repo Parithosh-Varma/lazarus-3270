@@ -8,7 +8,8 @@
     "cobol": "node harness/cobol-oracle.mjs",
     "cobol:emit": "node harness/cobol-oracle.mjs --emit",
     "harness": "node harness/run-equivalence-harness.mjs && node harness/fault-injector.mjs",
-    "test": "node --test tests/unit/*.test.mjs tests/pbt/*.pbt.mjs tests/golden.test.mjs tests/cobol.test.mjs && node harness/run-equivalence-harness.mjs && node harness/fault-injector.mjs"
+    "cartridges": "node harness/cartridge-oracle.mjs",
+    "test": "npm run build && node --test tests/unit/*.test.mjs tests/pbt/*.pbt.mjs tests/golden.test.mjs tests/cobol.test.mjs tests/cartridges.test.mjs && node harness/run-equivalence-harness.mjs && node harness/fault-injector.mjs && node harness/cartridge-oracle.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
