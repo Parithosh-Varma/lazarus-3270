@@ -482,6 +482,7 @@ const sfx = {
   ok: () => { tone(660, 0, 60); tone(990, 70, 90); },
   warn: () => tone(330, 0, 140, "triangle", 0.05),
   bad: () => { tone(180, 0, 120, "sawtooth", 0.05); tone(140, 130, 160, "sawtooth", 0.05); },
+  hover: () => tone(1200, 0, 15, "square", 0.015),
   result: (t) => { (t === "ok" ? sfx.ok : t === "warn" ? sfx.warn : sfx.bad)(); },
 };
 
@@ -727,7 +728,12 @@ function buildOptions() {
     head.textContent = c.id;
     li.append(head, document.createTextNode(c.title));
     li.addEventListener("click", () => selectProgram(c.id));
-    li.addEventListener("mousemove", () => setHot(c.id));
+    li.addEventListener("mousemove", () => {
+      if (document.querySelector("#program-list li.hot")?.dataset.id !== c.id) {
+        setHot(c.id);
+        sfx.hover();
+      }
+    });
     list.append(li);
   }
   $("program-text").textContent = current().id + " · " + current().title;
