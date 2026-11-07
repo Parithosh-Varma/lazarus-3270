@@ -373,7 +373,7 @@
         </div>
       </div>
 
-      <div class="lnote" id="blurb">Wire fee 1.50, debited before the overdraft check.</div>
+      <div class="lnote" id="blurb">Incoming wire, 1.50 fee taken off the top.</div>
 
       <pre class="screen" id="screen" aria-live="polite">COREBANK 3270 READY
 AWAITING AID_ENTER<span class="cursor"></span></pre>
@@ -621,7 +621,7 @@ const WIRE = "COREBANK-WIRE";
 let catalog = [{
   id: WIRE,
   title: "WIRE TRANSFER",
-  blurb: "Wire fee 1.50, debited before the overdraft check.",
+  blurb: "Incoming wire, 1.50 fee taken off the top.",
   inputs: [
     { name: "balance", label: "ACCOUNT BALANCE", value: "10000.00" },
     { name: "amount", label: "AMOUNT", value: "1005.13" },

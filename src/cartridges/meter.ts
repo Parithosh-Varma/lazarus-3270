@@ -23,13 +23,22 @@ export const meter: Cartridge = {
       roundHalfEven(BigInt(t2) * RATE_TENTHS[1], 10n) +
       roundHalfEven(BigInt(t3) * RATE_TENTHS[2], 10n);
 
+    // Meter reader's ticket: per-tier bars plus each tier's own subtotal.
+    const barFor = (t: number) => {
+      const filled = kwh > 0 ? Math.round((t / kwh) * 10) : 0;
+      return "#".repeat(filled) + "-".repeat(10 - filled);
+    };
+    const line = (t: number, upto: string, cRate: string, rate10: bigint) =>
+      `  ${upto.padEnd(9)} ${String(t).padStart(4)} KWH x ${cRate} = $${formatCents(roundHalfEven(BigInt(t) * rate10, 10n))} [${barFor(t)}]`;
+
     return emit(
       "METER-78",
       "OK",
       [
-        "METER-78 TIERED BILLING",
-        `CONSUMPTION ${kwh} KWH`,
-        `TIERS ${t1} · ${t2} · ${t3}`,
+        `METER-78 · METER READING  ${String(kwh).padStart(5)} KWH`,
+        line(t1, "0-100", "12.5c", RATE_TENTHS[0]),
+        line(t2, "101-250", "18.0c", RATE_TENTHS[1]),
+        line(t3, "251+", "24.0c", RATE_TENTHS[2]),
         `BILL $${formatCents(bill)}`,
         "AID_ENTER",
       ],

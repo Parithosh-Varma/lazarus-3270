@@ -36,14 +36,20 @@ export const telco: Cartridge = {
     const mm = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
     const ss = String(seconds % 60).padStart(2, "0");
 
+    // Call detail record: numbers derived from the duration so the same
+    // call always dials the same pair.
+    const from = `415-555-${String(1000 + ((seconds * 7) % 9000)).padStart(4, "0")}`;
+    const to = `212-555-${String(1000 + ((seconds * 13 + 7) % 9000)).padStart(4, "0")}`;
+    const usage = cost - fee;
+
     return emit(
       "TELCO-79",
       status,
       [
-        "TELCO-79 CALL RATING",
-        `DURATION ${hh}:${mm}:${ss} · BILLABLE UNITS ${units}`,
-        `RATE $${formatCents(rate)}/MIN · FEE $${formatCents(fee)}`,
-        `COST $${formatCents(cost)}`,
+        "TELCO-79 · CALL DETAIL RECORD",
+        `CALL ${from} -> ${to}  ${hh}:${mm}:${ss}`,
+        `${units} UNITS x $${formatCents(rate)}/MIN / 10 = $${formatCents(usage)} + FEE $${formatCents(fee)}`,
+        `TOTAL $${formatCents(cost)}  ${status}`,
         "AID_ENTER",
       ],
       { units: String(units), cost: formatCents(cost) },

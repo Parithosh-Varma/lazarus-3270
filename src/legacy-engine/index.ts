@@ -93,7 +93,20 @@ export function runLegacy(tx: LegacyTx): { screen: string; newBalance: string; s
   const b = parseDecimalToCents(tx.balance);
   const a = parseDecimalToCents(tx.amount);
   const r = legacyWireTransfer(b, a);
-  const screen = `COREBANK 3270 READY\nSEND $${formatCents(a)}\nBAL $${formatCents(r.newBalanceCents)} ${r.status}\nAID_ENTER`;
+  // Mock directory + trace numbers, all derived from the inputs so the
+  // advice slip is deterministic: same inputs, same slip.
+  const from4 = (b % 10000n).toString().padStart(4, "0");
+  const to4 = ((a * 7n + 13n) % 10000n).toString().padStart(4, "0");
+  const auth = ((b * 31n + a * 17n) % 1000000n).toString().padStart(6, "0");
+  const debit = a - 150n;
+  const screen = [
+    `COREBANK 3270 · WIRE ADVICE  AUTH ${auth}`,
+    `FROM FIRST CONTINENTAL BK RT 021000089 ACCT ****${from4}`,
+    `TO   LIBERTY TRUST        RT 026009593 ACCT ****${to4}`,
+    `AMT $${formatCents(a)}  FEE $1.50  CREDIT $${formatCents(debit)}`,
+    `BAL $${formatCents(b)} -> $${formatCents(r.newBalanceCents)}  ${r.status}`,
+    "AID_ENTER",
+  ].join("\n");
   return {
     screen,
     newBalance: formatCents(r.newBalanceCents),

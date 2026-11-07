@@ -35,13 +35,32 @@ export const sabre: Cartridge = {
       fare = roundHalfEven(base * MULT[cls], 1000n);
     }
 
+    // Seat map: rows of six (ABC | DEF), filled from the nose. This trip's
+    // seats are XX, everything else open (..). Capped at 10 rows on screen.
+    const booked = status === "CONFIRMED" ? requested : 0;
+    const rows = Math.ceil(seats / 6);
+    const shown = Math.min(rows, 10);
+    const map: string[] = [];
+    for (let r = 0; r < shown; r++) {
+      const cells: string[] = [];
+      for (let s = 0; s < 6; s++) {
+        const idx = r * 6 + s;
+        if (s === 3) cells.push("|");
+        cells.push(idx >= seats ? "  " : idx < booked ? "XX" : "..");
+      }
+      map.push(`ROW ${String(r + 1).padStart(2, "0")}  ${cells.join(" ")}`);
+    }
+    if (rows > shown) map.push(`+ ${seats - shown * 6} SEATS NOT SHOWN`);
+    const multLabel = cls in MULT ? `x${(Number(MULT[cls]) / 1000).toFixed(1)}` : cls;
+
     return emit(
       "SABRE-83",
       status,
       [
-        "SABRE-83 SEAT INVENTORY",
-        `REQUEST ${requested}${cls} OF ${seats}`,
-        `FARE $${formatCents(fare)}`,
+        `SABRE-83 SEAT MAP · ${seats} SEATS · ${booked} BOOKED THIS TXN`,
+        ...map,
+        `XX BOOKED · .. OPEN · REQUEST ${requested}${cls} OF ${seats}`,
+        `FARE $${formatCents(base)} ${multLabel} = $${formatCents(fare)}`,
         `STATUS ${status}`,
         "AID_ENTER",
       ],
