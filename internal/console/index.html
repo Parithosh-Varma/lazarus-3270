@@ -483,6 +483,7 @@ const sfx = {
   warn: () => tone(330, 0, 140, "triangle", 0.05),
   bad: () => { tone(180, 0, 120, "sawtooth", 0.05); tone(140, 130, 160, "sawtooth", 0.05); },
   hover: () => tone(1200, 0, 15, "square", 0.015),
+  key: (k) => tone(k === "Backspace" ? 700 : 1500, 0, 12, "square", 0.012),
   chaChing: () => {
     tone(988, 0, 90, "triangle", 0.05);
     tone(1976, 0, 70, "sine", 0.02);
@@ -605,6 +606,7 @@ function renderFields() {
     input.spellcheck = false;
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") { e.preventDefault(); execute(); }
+      else if (e.key.length === 1 || e.key === "Backspace" || e.key === "Delete") sfx.key(e.key);
     });
     row.append(label, input);
     wrap.append(row);
