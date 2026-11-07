@@ -9,10 +9,15 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - name: install GnuCOBOL
+        run: sudo apt-get update && sudo apt-get install -y gnucobol
       - run: npm install
       - run: ./node_modules/.bin/tsc --noEmit -p tsconfig.json
       - run: node --test tests/unit/*.test.mjs
       - run: node --test tests/pbt/*.pbt.mjs
       - run: node --test tests/golden.test.mjs
+      - name: compile and run the real COBOL oracle
+        run: COBOL_REQUIRE=1 node harness/cobol-oracle.mjs
+      - run: node --test tests/cobol.test.mjs
       - run: npm run harness
       - run: test -d .kiro/specs && test -d .kiro/hooks && test -d .kiro/steering && test -f LICENSE && git ls-tree HEAD .kiro/ | grep -q specs
