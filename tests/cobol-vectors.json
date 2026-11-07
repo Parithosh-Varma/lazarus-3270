@@ -1,0 +1,271 @@
+{
+  "source": "src/cartridges/corebank.cbl",
+  "compiler": "cobc (GnuCOBOL) 3.2.0",
+  "note": "Produced by the compiled COBOL program. Regenerate with: node harness/cobol-oracle.mjs --emit",
+  "vectors": [
+    {
+      "kind": "W",
+      "in": [
+        "1000000",
+        "100513"
+      ],
+      "cobol": {
+        "cents": "1100363",
+        "status": "OK"
+      },
+      "typescript": {
+        "cents": "1100363",
+        "status": "OK"
+      },
+      "match": true
+    },
+    {
+      "kind": "W",
+      "in": [
+        "0",
+        "0"
+      ],
+      "cobol": {
+        "cents": "0",
+        "status": "OVERDRAFT"
+      },
+      "typescript": {
+        "cents": "0",
+        "status": "OVERDRAFT"
+      },
+      "match": true
+    },
+    {
+      "kind": "W",
+      "in": [
+        "149",
+        "0"
+      ],
+      "cobol": {
+        "cents": "149",
+        "status": "OVERDRAFT"
+      },
+      "typescript": {
+        "cents": "149",
+        "status": "OVERDRAFT"
+      },
+      "match": true
+    },
+    {
+      "kind": "W",
+      "in": [
+        "150",
+        "0"
+      ],
+      "cobol": {
+        "cents": "0",
+        "status": "OK"
+      },
+      "typescript": {
+        "cents": "0",
+        "status": "OK"
+      },
+      "match": true
+    },
+    {
+      "kind": "W",
+      "in": [
+        "151",
+        "0"
+      ],
+      "cobol": {
+        "cents": "1",
+        "status": "OK"
+      },
+      "typescript": {
+        "cents": "1",
+        "status": "OK"
+      },
+      "match": true
+    },
+    {
+      "kind": "W",
+      "in": [
+        "100",
+        "0"
+      ],
+      "cobol": {
+        "cents": "100",
+        "status": "OVERDRAFT"
+      },
+      "typescript": {
+        "cents": "100",
+        "status": "OVERDRAFT"
+      },
+      "match": true
+    },
+    {
+      "kind": "W",
+      "in": [
+        "1",
+        "1000000"
+      ],
+      "cobol": {
+        "cents": "999851",
+        "status": "OK"
+      },
+      "typescript": {
+        "cents": "999851",
+        "status": "OK"
+      },
+      "match": true
+    },
+    {
+      "kind": "W",
+      "in": [
+        "9999999999999",
+        "0"
+      ],
+      "cobol": {
+        "cents": "9999999999849",
+        "status": "OK"
+      },
+      "typescript": {
+        "cents": "9999999999849",
+        "status": "OK"
+      },
+      "match": true
+    },
+    {
+      "kind": "W",
+      "in": [
+        "9999999999999",
+        "9999999999999"
+      ],
+      "cobol": {
+        "cents": "9999999999999",
+        "status": "SIZE_ERROR"
+      },
+      "typescript": {
+        "cents": "9999999999999",
+        "status": "SIZE_ERROR"
+      },
+      "match": true
+    },
+    {
+      "kind": "I",
+      "in": [
+        "100000",
+        "3650",
+        "1"
+      ],
+      "cobol": {
+        "cents": "100"
+      },
+      "typescript": {
+        "cents": "100"
+      },
+      "match": true
+    },
+    {
+      "kind": "I",
+      "in": [
+        "500",
+        "3650",
+        "1"
+      ],
+      "cobol": {
+        "cents": "0"
+      },
+      "typescript": {
+        "cents": "0"
+      },
+      "match": true
+    },
+    {
+      "kind": "I",
+      "in": [
+        "1500",
+        "3650",
+        "1"
+      ],
+      "cobol": {
+        "cents": "2"
+      },
+      "typescript": {
+        "cents": "2"
+      },
+      "match": true
+    },
+    {
+      "kind": "I",
+      "in": [
+        "100000",
+        "100",
+        "0"
+      ],
+      "cobol": {
+        "cents": "0"
+      },
+      "typescript": {
+        "cents": "0"
+      },
+      "match": true
+    },
+    {
+      "kind": "I",
+      "in": [
+        "100000",
+        "0",
+        "5"
+      ],
+      "cobol": {
+        "cents": "0"
+      },
+      "typescript": {
+        "cents": "0"
+      },
+      "match": true
+    },
+    {
+      "kind": "I",
+      "in": [
+        "100000",
+        "169",
+        "185"
+      ],
+      "cobol": {
+        "cents": "925"
+      },
+      "typescript": {
+        "cents": "925"
+      },
+      "match": true
+    },
+    {
+      "kind": "I",
+      "in": [
+        "1909099",
+        "169",
+        "185"
+      ],
+      "cobol": {
+        "cents": "16296"
+      },
+      "typescript": {
+        "cents": "16296"
+      },
+      "match": true
+    },
+    {
+      "kind": "I",
+      "in": [
+        "5000000",
+        "425",
+        "30"
+      ],
+      "cobol": {
+        "cents": "17429"
+      },
+      "typescript": {
+        "cents": "17429"
+      },
+      "match": true
+    }
+  ]
+}
