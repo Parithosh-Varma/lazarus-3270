@@ -130,6 +130,9 @@ const server = createServer((req, res) => {
   if (req.method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {
     return send(200, readFileSync(join(HERE, "index.html")));
   }
+  if (req.method === "GET" && url.pathname === "/cha-ching.mp3") {
+    return send(200, readFileSync(join(HERE, "cha-ching.mp3")), "audio/mpeg");
+  }
   if (req.method === "GET" && url.pathname === "/api/state") {
     return json(res, 200, {
       ...proofNumbers(),

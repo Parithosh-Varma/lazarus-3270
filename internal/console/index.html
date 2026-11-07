@@ -454,6 +454,8 @@ const CELLS = 28;
    gesture so autoplay policy stays happy; silent when toggled off. */
 let soundOn = true;
 let AC = null;
+const chachingAudio = new Audio("cha-ching.mp3");
+chachingAudio.preload = "auto";
 const ac = () => {
   if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
   if (AC.state === "suspended") AC.resume().catch(() => {});
@@ -485,8 +487,16 @@ const sfx = {
   hover: () => tone(1200, 0, 15, "square", 0.015),
   key: (k) => tone(k === "." ? 2100 : k === "Backspace" ? 700 : 1500, 0, 12, "square", 0.012),
   chaChing: () => {
-    /* Real till: a noise clank ("ka") then a bell ("ching") built from
-       inharmonic partials that decay at different rates. All synth, no assets. */
+    /* The real till recording. The synth bell below is fallback only. */
+    if (!soundOn) return;
+    try {
+      chachingAudio.currentTime = 0;
+      const p = chachingAudio.play();
+      if (p && p.catch) p.catch(() => sfx.bell());
+    } catch { sfx.bell(); }
+  },
+  bell: () => {
+    /* Fallback bell: a noise clank ("ka") then inharmonic partials ("ching"). */
     if (!soundOn) return;
     try {
       const ctx = ac();
