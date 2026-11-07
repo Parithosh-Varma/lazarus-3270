@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "console": "node internal/console/serve.mjs",
     "cobol": "node harness/cobol-oracle.mjs",
     "cobol:emit": "node harness/cobol-oracle.mjs --emit",
     "harness": "node harness/run-equivalence-harness.mjs && node harness/fault-injector.mjs",

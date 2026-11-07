@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAZARUS-3270 · OPERATOR CONSOLE</title>
+<style>
+  :root {
+    --void: #070b08;
+    --panel: #0a130c;
+    --p1: #7cf29b;
+    --p1-mid: #4aa96c;
+    --p1-dim: #2a6640;
+    --p1-ghost: #143122;
+    --amber: #ffb35c;
+    --alarm: #ff6b62;
+    --mono: "Berkeley Mono", "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    min-height: 100%;
+    background: var(--void);
+    color: var(--p1);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.22) 0 1px,
+      rgba(0, 0, 0, 0) 1px 3px
+    );
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 8;
+    background: radial-gradient(120% 90% at 50% 0%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+  }
+
+  .crt {
+    position: relative;
+    z-index: 1;
+    min-height: 100dvh;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: power-on 420ms ease-out both;
+  }
+
+  @keyframes power-on {
+    from { opacity: 0.4; filter: brightness(0.4); }
+    to { opacity: 1; filter: brightness(1); }
+  }
+
+  .bar {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--p1-ghost);
+  }
+
+  .sysid {
+    font-size: 15px;
+    letter-spacing: 0.16em;
+    text-shadow: 0 0 10px rgba(124, 242, 155, 0.35);
+  }
+
+  .bar .meta {
+    color: var(--p1-dim);
+    letter-spacing: 0.1em;
+    font-size: 11px;
+  }
+
+  .bar .clock { margin-left: auto; color: var(--p1-mid); letter-spacing: 0.08em; }
+
+  .deck {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 10px;
+    min-height: 0;
+  }
+
+  .panel {
+    background: linear-gradient(180deg, var(--panel), rgba(7, 11, 8, 0.9));
+    border: 1px solid var(--p1-ghost);
+    padding: 14px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .tag {
+    color: var(--p1-dim);
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .field { display: flex; align-items: baseline; gap: 10px; }
+
+  .field label {
+    width: 17ch;
+    flex: none;
+    color: var(--p1-mid);
+    letter-spacing: 0.08em;
+    font-size: 11.5px;
+  }
+
+  .field input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--p1-dim);
+    color: var(--p1);
+    font: inherit;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    padding: 3px 2px 4px;
+    text-shadow: 0 0 8px rgba(124, 242, 155, 0.3);
+    caret-color: var(--p1);
+  }
+
+  .field input:focus {
+    outline: none;
+    border-bottom-color: var(--p1);
+    background: rgba(124, 242, 155, 0.05);
+  }
+
+  .field input:focus-visible { outline: 1px solid var(--p1); outline-offset: 3px; }
+
+  .screen {
+    flex: 1;
+    min-height: 132px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--p1-ghost);
+    padding: 10px 12px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    letter-spacing: 0.05em;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    color: var(--p1-mid);
+  }
+
+  .screen .hi { color: var(--p1); text-shadow: 0 0 8px rgba(124, 242, 155, 0.35); }
+  .screen .ok { color: var(--p1); }
+  .screen .warn { color: var(--amber); }
+  .screen .bad { color: var(--alarm); }
+
+  .cursor {
+    display: inline-block;
+    width: 0.62em;
+    height: 1.05em;
+    background: var(--p1);
+    vertical-align: -0.18em;
+    animation: blink 1.06s steps(1) infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .dump {
+    font-size: 11px;
+    color: var(--p1-dim);
+    letter-spacing: 0.04em;
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+
+  .dump b { color: var(--p1-mid); font-weight: 400; }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  button {
+    font: inherit;
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    color: var(--p1);
+    background: transparent;
+    border: 1px solid var(--p1-dim);
+    padding: 8px 14px;
+    cursor: pointer;
+    text-shadow: 0 0 8px rgba(124, 242, 155, 0.25);
+  }
+
+  button:hover { border-color: var(--p1); background: rgba(124, 242, 155, 0.07); }
+  button:active { background: rgba(124, 242, 155, 0.14); }
+  button:focus-visible { outline: 1px solid var(--p1); outline-offset: 2px; }
+  button[disabled] { color: var(--p1-dim); border-color: var(--p1-ghost); cursor: progress; }
+  button.ghost { color: var(--p1-dim); }
+
+  .layers { list-style: none; display: flex; flex-direction: column; gap: 13px; flex: 1; }
+
+  .layers li { display: flex; flex-direction: column; gap: 4px; }
+
+  .lhead { display: flex; align-items: baseline; gap: 8px; }
+
+  .lid { color: var(--p1-dim); font-size: 10.5px; letter-spacing: 0.1em; }
+
+  .lname {
+    color: var(--p1-mid);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .lnum { color: var(--p1); font-size: 12px; letter-spacing: 0.04em; }
+
+  .meter {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .meter .on { color: var(--p1); text-shadow: 0 0 7px rgba(124, 242, 155, 0.3); }
+  .meter .off { color: var(--p1-ghost); }
+  .meter.amber .on { color: var(--amber); text-shadow: 0 0 7px rgba(255, 179, 92, 0.25); }
+
+  .lnote { color: var(--p1-dim); font-size: 10.5px; letter-spacing: 0.03em; }
+
+  .stamp { color: var(--p1-dim); font-size: 10.5px; min-height: 1.5em; }
+
+  .oia {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--p1-ghost);
+    padding-top: 7px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--p1-dim);
+  }
+
+  .oia .x { color: var(--p1-mid); }
+  .oia .msg { color: var(--p1); }
+  .oia .msg.warn { color: var(--amber); }
+  .oia .msg.bad { color: var(--alarm); }
+  .oia .spacer { flex: 1; }
+
+  @media (max-width: 960px) {
+    .deck { grid-template-columns: minmax(0, 1fr); }
+    .field label { width: 14ch; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .crt { animation: none; }
+    .cursor { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="crt">
+
+  <header class="bar">
+    <span class="sysid">LAZARUS-3270</span>
+    <span class="meta">MODEL 2 · 24×80 · EBCDIC CP037 · NEAREST-EVEN</span>
+    <span class="clock" id="clock">--:--:--</span>
+  </header>
+
+  <main class="deck">
+
+    <section class="panel" aria-label="CoreBank wire transfer">
+      <div class="tag">COREBANK · TXN 01 · WIRE TRANSFER</div>
+
+      <div class="field">
+        <label for="balance">ACCOUNT BALANCE</label>
+        <input id="balance" value="10000.00" inputmode="decimal" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="amount">AMOUNT</label>
+        <input id="amount" value="1005.13" inputmode="decimal" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label>WIRE FEE</label>
+        <span class="lnote">1.50 · DEBITED BEFORE THE OVERDRAFT CHECK</span>
+      </div>
+
+      <pre class="screen" id="screen" aria-live="polite">COREBANK 3270 READY
+AWAITING AID_ENTER<span class="cursor"></span></pre>
+
+      <div class="dump" id="dump" aria-label="EBCDIC bytes"></div>
+
+      <div class="actions">
+        <button id="execute" type="button">PF1 · EXECUTE WIRE</button>
+        <button id="clear" type="button" class="ghost">PF3 · CLEAR</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Proof layers">
+      <div class="tag">PROOF · FOUR LAYERS</div>
+
+      <ol class="layers" id="layers">
+        <li>
+          <div class="lhead">
+            <span class="lid">01</span>
+            <span class="lname">EQUIVALENCE</span>
+            <span class="lnum" id="n-equivalence">—</span>
+          </div>
+          <div class="meter" id="m-equivalence" aria-hidden="true"></div>
+          <div class="lnote" id="note-equivalence">legacy == modern · seeded</div>
+        </li>
+        <li>
+          <div class="lhead">
+            <span class="lid">02</span>
+            <span class="lname">GOLDEN VECTORS</span>
+            <span class="lnum" id="n-golden">—</span>
+          </div>
+          <div class="meter" id="m-golden" aria-hidden="true"></div>
+          <div class="lnote">answers computed by hand, not by the code</div>
+        </li>
+        <li>
+          <div class="lhead">
+            <span class="lid">03</span>
+            <span class="lname">MUTANT KILL RATE</span>
+            <span class="lnum" id="n-fault">—</span>
+          </div>
+          <div class="meter" id="m-fault" aria-hidden="true"></div>
+          <div class="lnote">deliberately broken copies the suite must catch</div>
+        </li>
+        <li>
+          <div class="lhead">
+            <span class="lid">04</span>
+            <span class="lname">COMPILED COBOL</span>
+            <span class="lnum" id="n-cobol">—</span>
+          </div>
+          <div class="meter" id="m-cobol" aria-hidden="true"></div>
+          <div class="lnote" id="note-cobol">independent oracle · GnuCOBOL</div>
+        </li>
+      </ol>
+
+      <div class="stamp" id="stamp"></div>
+      <div class="actions">
+        <button id="prove" type="button">PF2 · RUN PROOF SUITE</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="oia">
+    <span class="x" id="oia-x">X SYSTEM</span>
+    <span class="msg" id="oia-msg">READY</span>
+    <span class="spacer"></span>
+    <span id="oia-mode">ROUND_MODE NEAREST-EVEN</span>
+  </footer>
+
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const CELLS = 28;
+
+function meter(id, pass, total, amber) {
+  const on = total > 0 ? Math.round((pass / total) * CELLS) : 0;
+  const el = $(id);
+  el.classList.toggle("amber", Boolean(amber));
+  el.innerHTML =
+    '<span class="on">' + "▓".repeat(on) + "</span>" +
+    '<span class="off">' + "░".repeat(CELLS - on) + "</span>";
+}
+
+function oia(text, tone) {
+  const el = $("oia-msg");
+  el.textContent = text;
+  el.className = "msg" + (tone ? " " + tone : "");
+}
+
+function state(s) {
+  $("n-equivalence").textContent = s.equivalence.pass + "/" + s.equivalence.total;
+  meter("m-equivalence", s.equivalence.pass, s.equivalence.total);
+  if (s.equivalence.vibeFails != null) {
+    $("note-equivalence").textContent =
+      "legacy == modern · float strawman fails " + s.equivalence.vibeFails;
+  }
+
+  $("n-golden").textContent = s.golden.pass + "/" + s.golden.total;
+  meter("m-golden", s.golden.pass, s.golden.total);
+
+  $("n-fault").textContent = s.fault.killed + "/" + s.fault.total + " · " + s.fault.rate;
+  meter("m-fault", s.fault.killed, s.fault.total, s.fault.killed < s.fault.total);
+
+  $("n-cobol").textContent = s.cobol.pass + "/" + s.cobol.total;
+  meter("m-cobol", s.cobol.pass, s.cobol.total);
+  $("note-cobol").textContent = "independent oracle · " + s.cobol.compiler;
+}
+
+function dump(bytes) {
+  const rows = [];
+  for (let i = 0; i < bytes.length; i += 16) {
+    const slice = bytes.slice(i, i + 16);
+    const hex = slice.map((b) => b.toString(16).toUpperCase().padStart(2, "0")).join(" ");
+    const addr = i.toString(16).toUpperCase().padStart(4, "0");
+    rows.push("<b>" + addr + "</b>  " + hex);
+  }
+  $("dump").innerHTML = rows.join("\n");
+}
+
+function render(d) {
+  const tone = d.modern.status === "OK" ? "ok"
+    : d.modern.status === "OVERDRAFT" ? "warn" : "bad";
+  const lines = d.oracle.screen.split("\n");
+  const body = lines.map((line, i) =>
+    "<span class=\"" + (i === 0 ? "hi" : "") + "\">" + escapeHtml(line) + "</span>"
+  ).join("\n");
+
+  $("screen").innerHTML =
+    body +
+    '\n<span class="' + tone + '">' +
+    (d.match ? "ORACLE == MODERN" : "ORACLE != MODERN") +
+    "</span>" +
+    '\n<span class="lnote">oracle ' + d.micros.oracle.toFixed(2) +
+    " µs · modern " + d.micros.modern.toFixed(2) + " µs</span>" +
+    '<span class="cursor"></span>';
+
+  dump(d.ebcdic);
+
+  if (d.modern.status === "OK") oia("TXN OK · " + d.modern.newBalance, null);
+  else if (d.modern.status === "OVERDRAFT") oia("TXN OVERDRAFT · BALANCE UNCHANGED", "warn");
+  else oia("TXN SIZE_ERROR · BALANCE UNCHANGED", "bad");
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+}
+
+async function execute() {
+  const btn = $("execute");
+  btn.disabled = true;
+  oia("SENDING …", null);
+  try {
+    const res = await fetch("/api/transaction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ balance: $("balance").value, amount: $("amount").value }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "request failed");
+    render(data);
+  } catch (e) {
+    $("screen").innerHTML = '<span class="bad">' + escapeHtml(String(e.message || e)) + "</span>";
+    oia("X SYSTEM · SERVER DID NOT RESPOND", "bad");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function prove() {
+  const btn = $("prove");
+  btn.disabled = true;
+  $("stamp").textContent = "RUNNING HARNESS + FAULT INJECTOR …";
+  oia("PROOF SUITE RUNNING", null);
+  try {
+    const res = await fetch("/api/proof", { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "request failed");
+    state({ ...data, golden: window.__state.golden, cobol: window.__state.cobol });
+    $("stamp").textContent =
+      "RAN " + new Date(data.ranAt).toLocaleTimeString() +
+      " · " + data.equivalence.ms + "ms harness";
+    oia("PROOF " + data.equivalence.pass + "/" + data.equivalence.total +
+      " · " + data.fault.killed + "/" + data.fault.total + " MUTANTS KILLED", null);
+  } catch (e) {
+    $("stamp").textContent = String(e.message || e);
+    oia("PROOF SUITE FAILED", "bad");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function clock() {
+  const t = new Date().toTimeString().slice(0, 8);
+  $("clock").textContent = t;
+}
+
+$("execute").addEventListener("click", execute);
+$("prove").addEventListener("click", prove);
+$("clear").addEventListener("click", () => {
+  $("screen").innerHTML = "COREBANK 3270 READY\nAWAITING AID_ENTER" + '<span class="cursor"></span>';
+  $("dump").innerHTML = "";
+  oia("CLEARED · READY", null);
+});
+
+for (const id of ["balance", "amount"]) {
+  $(id).addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); execute(); }
+  });
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "F1") { e.preventDefault(); execute(); }
+  if (e.key === "F2") { e.preventDefault(); prove(); }
+});
+
+clock();
+setInterval(clock, 1000);
+
+fetch("/api/state")
+  .then((r) => r.json())
+  .then((s) => { window.__state = s; state(s); oia("READY", null); })
+  .catch(() => oia("X SYSTEM · SERVER DID NOT RESPOND", "bad"));
+</script>
+</body>
+</html>
