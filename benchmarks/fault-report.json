@@ -1,7 +1,7 @@
 {
   "mutants": 24,
-  "killed": 20,
-  "killRate": "83.3%",
+  "killed": 22,
+  "killRate": "91.7%",
   "seed": 99,
   "details": [
     {
@@ -38,7 +38,7 @@
     },
     {
       "name": "round-half-up",
-      "killed": false
+      "killed": true
     },
     {
       "name": "skip-last-day",
@@ -86,7 +86,7 @@
     },
     {
       "name": "vibe-stepped-rounded",
-      "killed": false
+      "killed": true
     },
     {
       "name": "wire-truncate-cents",

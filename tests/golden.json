@@ -11,6 +11,8 @@
   { "id": "wire-fee-edge-149", "kind": "wire", "in": [149, 0], "out": [149, "OVERDRAFT"] },
   { "id": "wire-overdraft-keeps", "kind": "wire", "in": [100, 0], "out": [100, "OVERDRAFT"] },
   { "id": "interest-1day-1pct", "kind": "interest", "in": [100000, 3650, 1], "out": "100" },
+  { "id": "interest-tie-even-zero", "kind": "interest", "in": [500, 3650, 1], "out": "0" },
+  { "id": "interest-tie-even-two", "kind": "interest", "in": [1500, 3650, 1], "out": "2" },
   { "id": "interest-zero-days", "kind": "interest", "in": [100000, 100, 0], "out": "0" },
   { "id": "ebcdic-A", "kind": "ebcdic", "in": "A", "out": 193 },
   { "id": "ebcdic-dash", "kind": "ebcdic", "in": "-", "out": 96 },

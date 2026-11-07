@@ -108,6 +108,21 @@ for (const m of mutants) {
     }
   }
   if (!caught && m.interest) {
+    // Boundary first: exact half-cent ties are the only place a
+    // half-up mutant differs, and random sampling almost never hits
+    // one. These three are hand-derived and also live in golden.json.
+    const interestEdges = [
+      [500, 3650, 1],
+      [1500, 3650, 1],
+      [100000, 3650, 1],
+      [100000, 0, 5],
+      [100000, 169, 185],
+    ];
+    for (const [p, bps, days] of interestEdges) {
+      if (m.interest(p, bps, days) !== correctFinal(p, bps, days)) { caught = true; break; }
+    }
+  }
+  if (!caught && m.interest) {
     for (let i = 0; i < 200; i++) {
       const p = Number(randRange(next, 500000n, 2500000n));
       const bps = Number(randRange(next, 100n, 3000n));
