@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAZARUS-3270 · RESURRECTION DEMO</title>
+<style>
+  body { background:#070b08; color:#e8f5eb; font-family:ui-monospace,Menlo,Consolas,monospace; margin:0; padding:18px; }
+  h1 { color:#7cf29b; letter-spacing:.14em; font-size:18px; }
+  .split { display:grid; grid-template-columns:1.2fr 1fr; gap:12px; }
+  @media (max-width:900px){ .split{grid-template-columns:1fr} }
+  .panel { border:1px solid #143122; background:#0a130c; padding:14px 16px; }
+  .tag { color:#2a6640; font-size:11px; letter-spacing:.2em; text-transform:uppercase; }
+  #terminal { background:#000; color:#7cf29b; white-space:pre; font-size:11.5px; line-height:1.3; overflow-x:auto; min-height:340px; margin:0; }
+  button { background:#173d22; color:#e8f5eb; border:1px solid #2e7d46; padding:9px 13px; margin:4px 4px 4px 0; cursor:pointer; font-family:inherit; }
+  input { background:#0d1610; color:#e8f5eb; border:1px solid #264a30; padding:9px; width:65%; font-family:inherit; }
+  .big { font-size:26px; color:#7cf29b; }
+  .refused { color:#ff6b62; font-weight:bold; font-size:20px; }
+  .approved { color:#7cf29b; font-weight:bold; font-size:20px; }
+  .muted { color:#8fae96; }
+</style>
+</head>
+<body>
+<h1>LAZARUS-3270 · RESURRECTION DEMO</h1>
+<p class="muted">A dead 3270 mainframe, talked to in plain English — with proof before reporting.
+The summary screen never shows holds. The Auditor re-reads independently before any transfer is judged.</p>
+<div>
+  <button onclick="showAccount('884739201')">1 · Show account 884739201</button>
+  <button onclick="transfer('13000')">2 · Try $13,000 transfer</button>
+  <button onclick="transfer('1000')">3 · Try $1,000 transfer</button>
+</div>
+<div class="split">
+  <div class="panel"><div class="tag">IBM 3270 terminal</div><pre id="terminal">READY</pre></div>
+  <div class="panel"><div class="tag">Modern dashboard</div>
+    <div id="dashboard"><p class="muted">No record loaded yet.</p></div>
+    <div class="tag" style="margin-top:14px">Chat</div>
+    <input id="chat" placeholder="Show me account 884739201">
+    <button onclick="sendChat()">Send</button>
+    <div id="log"></div>
+  </div>
+</div>
+<script>
+let current = '884739201';
+const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function renderAccount(d){
+  current = d.account;
+  document.getElementById('terminal').textContent = d.screen;
+  const t = d.translation;
+  document.getElementById('dashboard').innerHTML =
+    '<div class="big">' + esc(t.name) + '</div>' +
+    '<p>Account ' + esc(t.accountId) + '<br>Balance ' + esc(t.balanceDisplay) +
+    '<br>Status: ' + esc(t.statusPlain) + ' (' + esc(t.statusCode) + ')</p>';
+}
+async function showAccount(id){
+  const r = await fetch('/api/account/' + id);
+  const d = await r.json();
+  if (!r.ok) { document.getElementById('log').innerHTML = '<p>' + esc(d.error) + '</p>'; return; }
+  renderAccount(d);
+}
+async function transfer(amount){
+  const r = await fetch('/api/transfer', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ account: current, amount }) });
+  const d = await r.json();
+  if (!r.ok) { document.getElementById('log').innerHTML = '<p>' + esc(d.error) + '</p>'; return; }
+  document.getElementById('terminal').textContent = d.operatorRead.screenText;
+  const cls = d.approved ? 'approved' : 'refused';
+  document.getElementById('dashboard').innerHTML =
+    '<p class="' + cls + '">' + esc(d.decision) + '</p><p>' + esc(d.reason) + '</p>' +
+    '<p>First read (summary screen): balance $' + esc(d.firstRead.balance) + ' — holds not shown.<br>' +
+    'Auditor re-read (incl. HOLDS): holds $' + esc(d.auditorRead.totalHolds) +
+    ' — available $' + esc(d.auditorRead.available) + '</p>' +
+    (d.conflict ? '<p class="muted">Conflict between reads: shown, not hidden. That is the point.</p>' : '');
+}
+async function sendChat(){
+  const msg = document.getElementById('chat').value.trim();
+  const acct = (msg.match(/\b\d{6,12}\b/) || [])[0];
+  if (/transfer/i.test(msg) && acct) {
+    const amt = (msg.replace(acct, ' ').match(/[\d,]+(?:\.\d{1,2})?/) || [])[0];
+    current = acct;
+    if (amt) return transfer(amt.replace(/,/g, ''));
+  }
+  if (acct) return showAccount(acct);
+  document.getElementById('log').innerHTML = '<p>Try: "Show me account 884739201"</p>';
+}
+showAccount(current);
+</script>
+</body>
+</html>
