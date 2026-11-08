@@ -1,10 +1,13 @@
 // Internal console server. Zero dependencies.
 //   npm run console   ->  http://127.0.0.1:3270
 //
-// Serves one page and three endpoints:
+// Serves the console page and these endpoints:
 //   GET  /api/state        current proof numbers + versions
 //   POST /api/transaction  runs the legacy oracle and the modern engine
 //   POST /api/proof        re-runs the harness and the fault injector for real
+//   GET  /demo             split-screen Resurrection demo (3270 + dashboard)
+//   GET  /api/account/:id  Operator/Translator read of one account
+//   POST /api/transfer     Operator -> Translator -> Auditor transfer verdict
 //
 // It exists so the demo never depends on the public site being up.
 import { createServer } from "node:http";
@@ -26,6 +29,11 @@ if (!existsSync("dist/modern-engine/index.js")) {
 const legacy = await import(pathToFileURL(join(ROOT, "dist/legacy-engine/index.js")).href);
 const modern = await import(pathToFileURL(join(ROOT, "dist/modern-engine/index.js")).href);
 const carts = await import(pathToFileURL(join(ROOT, "dist/cartridges/index.js")).href);
+const emulator = await import(pathToFileURL(join(ROOT, "dist/emulator/index.js")).href);
+const operatorMod = await import(pathToFileURL(join(ROOT, "dist/crew/operator.js")).href);
+const translatorMod = await import(pathToFileURL(join(ROOT, "dist/crew/translator.js")).href);
+const transferMod = await import(pathToFileURL(join(ROOT, "dist/crew/transfer.js")).href);
+const demoHost = new emulator.Mainframe();
 
 const readJson = (path, fallback) => {
   try {
@@ -142,6 +150,8 @@ const server = createServer((req, res) => {
         "execute_3270_transaction",
         "run_legacy_oracle",
         "verify_ledger_parity",
+        "inquire_3270_account",
+        "audited_3270_transfer",
         "list_cartridges",
         "run_cartridge",
       ],
@@ -169,6 +179,40 @@ const server = createServer((req, res) => {
     req.on("end", () => {
       try {
         json(res, 200, transaction(JSON.parse(body || "{}")));
+      } catch (e) {
+        json(res, 400, { error: String(e?.message ?? e) });
+      }
+    });
+    return;
+  }
+  if (req.method === "GET" && url.pathname === "/demo") {
+    return send(200, readFileSync(join(HERE, "demo.html")));
+  }
+  if (req.method === "GET" && url.pathname.startsWith("/api/account/")) {
+    const accountId = decodeURIComponent(url.pathname.slice("/api/account/".length));
+    try {
+      const raw = new operatorMod.Operator(demoHost).inquire(accountId);
+      const translator = new translatorMod.Translator();
+      return json(res, 200, {
+        account: raw.accountId,
+        translation: translator.translate(raw),
+        translationText: translator.summaryText(raw),
+        screen: raw.screenText,
+      });
+    } catch (e) {
+      return json(res, 404, { error: String(e?.message ?? e) });
+    }
+  }
+  if (req.method === "POST" && url.pathname === "/api/transfer") {
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", () => {
+      try {
+        const { account, amount } = JSON.parse(body || "{}");
+        if (!account || amount === undefined || amount === null || String(amount).trim() === "") {
+          throw new Error("account and amount are required");
+        }
+        json(res, 200, transferMod.runTransfer(String(account), String(amount), demoHost));
       } catch (e) {
         json(res, 400, { error: String(e?.message ?? e) });
       }

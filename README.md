@@ -16,6 +16,8 @@ Banks, airlines, governments still run IBM 3270 green-screens and COBOL copybook
 - `src/modern-engine/` — clean API over the same rules + an honest float strawman for the demo.
 - `src/mcp/` — 3 tools: `execute_3270_transaction`, `run_legacy_oracle`, `verify_ledger_parity`. stdio, HTTP, and a Cloudflare Worker.
 - `src/crew/` — LocalJev client (no API key) for the three crew roles.
+- `src/emulator/` — a running 3270 session emulator: 24×80 buffer, named fields, MENU/INQUIRY/HOLDS screens, PF-key navigation, account dataset. The summary screen deliberately hides holds; they live on the HOLDS screen.
+- `src/crew/operator.ts` / `translator.ts` / `auditor.ts` — the demo Crew: Operator types into the terminal, Translator turns codes into plain English, Auditor re-reads independently (own session, HOLDS included) and judges transfers on proof, not claims.
 - `harness/run-equivalence-harness.mjs` — seeded 10007 runs (7 edges + 10k random), writes `benchmarks/`.
 - `harness/fault-injector.mjs` — 24 deliberately broken copies of the math; measures whether the suite actually catches them.
 - `harness/cobol-oracle.mjs` — compiles the COBOL program, drives it, compares to TypeScript.
@@ -54,6 +56,17 @@ Expected: `41 pass`, `PBT harness: 10007/10007 legacy==modern PASS`, `fault-inje
 - `execute3270Transaction("10000.00","1005.13")` → `{ newBalance:"11003.63", status:"OK|OVERDRAFT|SIZE_ERROR" }`
 - `runLegacy({program:"COREBANK-WIRE", balance, amount})` → `{ screen, newBalance, status, ebcdic }`
 - Negative amount throws. Overdraft/size keeps old balance.
+
+## Resurrection demo flow (Operator → Translator → Auditor)
+The 3-minute demo, runnable locally with no public site dependency:
+```
+npm install && npm run build && npm run console
+# open http://127.0.0.1:3270/demo
+```
+1. **Summon** — "Show me account 884739201": the Operator types it into the 3270 and the same record (Marcus Hale, $12,847.30, DORM-04) appears on the modern dashboard; the Translator explains the codes.
+2. **The blind spot** — the summary screen never shows holds. The Auditor opens its *own* session, presses PF5 to the HOLDS screen, and finds the hidden **$500.00 hold**. Available is $12,347.30, not $12,847.30.
+3. **The verdict** — transfer $13,000 → **REFUSED**, with both reads shown side by side (first read vs Auditor re-read, conflict flagged). Transfer $1,000 → **APPROVED**. Boundary behaviour is tested: $12,347.30 approves, $12,347.31 refuses.
+Same flow over MCP: `inquire_3270_account`, `audited_3270_transfer`. Spec: `.kiro/specs/lazarus-resurrection-demo/`. Tests: `tests/unit/demo-flow.test.mjs` + `tests/pbt/auditor.pbt.mjs` (real Auditor, 2000 seeded random cases).
 
 ## MCP (live)
 ```
@@ -99,10 +112,11 @@ Same routes mirrored at `https://mcp.lazarus-3270.pages.dev` (Pages Function pro
 - Crew wired to LocalJev: Archaeologist reads the copybook, Alchemist emits TypeScript under steering, Inquisitor writes breaking arbitraries. See below.
 
 ### Specs
-- Three complete specs, each with requirements (5 EARS), design, tasks:
+- Four complete specs, each with requirements (EARS), design, tasks:
   - `.kiro/specs/tn3270-emulator/` — screen rows, flow strings to pennies to strings, limits.
   - `.kiro/specs/cobol-mcp-bridge/` — copybook to typed MCP tool, stdio/HTTP/Worker parity.
   - `.kiro/specs/pbt-equivalence-engine/` — 5 invariants (conservation, monotonicity, rounding, EBCDIC bijection, size bounds).
+  - `.kiro/specs/lazarus-resurrection-demo/` — the session emulator + Operator/Translator/Auditor demo flow, 6 EARS rules incl. proof-before-reporting.
 - Every EARS rule maps to a named test or harness assertion.
 
 ### Hooks
@@ -141,7 +155,7 @@ Same routes mirrored at `https://mcp.lazarus-3270.pages.dev` (Pages Function pro
 
 ## Limitations (honest)
 - 1 cartridge so far (CoreBank). SABRE-83 + CivicTax next.
-- The compiled COBOL covers the wire and interest money paths; EBCDIC encoding and the 3270 screen are TypeScript models of the terminal, not a running emulator.
+- The compiled COBOL covers the wire and interest money paths; EBCDIC encoding and the wire advice screen in `runLegacy` are TypeScript models. A running 3270 session emulator (buffer, fields, PF keys, account screens) now exists in `src/emulator/` and drives the demo flow.
 - Day count is ACT/365-Fixed, no calendar leap handling yet.
 - COBOL `ROUNDED` defaults to away-from-zero; we implement NEAREST-EVEN by hand and label `ROUND_MODE` explicitly.
 - 2 of 24 mutants survive because they are behaviourally identical in this domain (invalid-day handling, EBCDIC on the wire path). Reported as-is rather than removed.
